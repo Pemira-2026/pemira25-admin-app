@@ -62,7 +62,7 @@ export default function LoginPage() {
                                    <Input
                                         id="email"
                                         type="email"
-                                        placeholder="email@student.nurulfikri.ac.id"
+                                        placeholder="admin@pemira.id"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -93,9 +93,6 @@ export default function LoginPage() {
                               </Button>
                          </CardFooter>
                     </form>
-                    <div className="mt-4 text-center text-xs text-muted-foreground break-all px-4">
-                         Debug API URL: {api.defaults.baseURL}
-                    </div>
                </Card>
           </div>
      );
