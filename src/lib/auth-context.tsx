@@ -1,0 +1,77 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { api } from "./api";
+
+type User = {
+     id: string;
+     email: string;
+     role: string;
+     name: string;
+};
+
+type AuthContextType = {
+     user: User | null;
+     loading: boolean;
+     login: (token: string, userData: User) => void;
+     logout: () => void;
+     isAuthenticated: boolean;
+};
+
+const AuthContext = createContext<AuthContextType>({
+     user: null,
+     loading: true,
+     login: () => { },
+     logout: () => { },
+     isAuthenticated: false
+});
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+     const [user, setUser] = useState<User | null>(null);
+     const [loading, setLoading] = useState(true);
+     const router = useRouter();
+     const pathname = usePathname();
+
+     useEffect(() => {
+          checkAuth();
+     }, []);
+
+     const checkAuth = async () => {
+          try {
+               const res = await api.get('/auth/me');
+               setUser(res.data);
+          } catch (error) {
+               setUser(null);
+               if (pathname !== '/login') {
+                    router.push('/login');
+               }
+          } finally {
+               setLoading(false);
+          }
+     };
+
+     const login = (token: string, userData: User) => {
+          setUser(userData);
+          router.push('/');
+     };
+
+     const logout = async () => {
+          try {
+               await api.post('/auth/logout');
+          } catch (error) {
+               console.error('Logout error', error);
+          }
+          setUser(null);
+          router.push('/login');
+     };
+
+     return (
+          <AuthContext.Provider value={{ user, loading, login, logout, isAuthenticated: !!user }}>
+               {children}
+          </AuthContext.Provider>
+     );
+}
+
+export const useAuth = () => useContext(AuthContext);
