@@ -20,15 +20,22 @@ export default function LoginPage() {
 
      const handleLogin = async (e: React.FormEvent) => {
           e.preventDefault();
+          console.log("LOGIN: Button clicked");
           setLoading(true);
           setError("");
 
           try {
+               console.log("LOGIN: Attempting to post to /auth/admin-login");
+               console.log("LOGIN: with email", email);
+               console.log("LOGIN: API Base URL:", api.defaults.baseURL);
+
                const res = await api.post('/auth/admin-login', { email, password });
+
+               console.log("LOGIN: Success", res.data);
                login(res.data.token, res.data.user);
           } catch (err: any) {
-               console.error(err);
-               setError(err.response?.data?.message || "Login failed");
+               console.error("LOGIN: Error caught", err);
+               setError(err.response?.data?.message || err.message || "Login failed");
           } finally {
                setLoading(false);
           }
@@ -55,7 +62,7 @@ export default function LoginPage() {
                                    <Input
                                         id="email"
                                         type="email"
-                                        placeholder="admin@pemira.id"
+                                        placeholder="email@student.nurulfikri.ac.id"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -86,6 +93,9 @@ export default function LoginPage() {
                               </Button>
                          </CardFooter>
                     </form>
+                    <div className="mt-4 text-center text-xs text-muted-foreground break-all px-4">
+                         Debug API URL: {api.defaults.baseURL}
+                    </div>
                </Card>
           </div>
      );
