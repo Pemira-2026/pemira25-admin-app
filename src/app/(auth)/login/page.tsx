@@ -21,10 +21,12 @@ export default function LoginPage() {
      const router = useRouter();
 
      // If already authenticated, redirect to dashboard
-     if (!authLoading && user) {
-          console.log("LOGIN PAGE: User already authenticated, redirecting to /");
-          router.push("/");
-     }
+     useEffect(() => {
+          if (!authLoading && user) {
+               console.log("LOGIN PAGE: User already authenticated, redirecting to /");
+               router.push("/");
+          }
+     }, [authLoading, user, router]);
 
      const handleLogin = async (e: React.FormEvent) => {
           e.preventDefault();
