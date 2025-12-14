@@ -53,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
      };
 
      const login = (token: string, userData: User) => {
+          localStorage.setItem('admin_token', token);
           setUser(userData);
           router.push('/');
      };
@@ -63,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } catch (error) {
                console.error('Logout error', error);
           }
+          localStorage.removeItem('admin_token');
           setUser(null);
           router.push('/login');
      };
