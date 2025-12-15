@@ -9,8 +9,8 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
+import { Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
      DropdownMenu,
@@ -20,6 +20,15 @@ import {
      DropdownMenuSeparator,
      DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+     Pagination,
+     PaginationContent,
+     PaginationItem,
+     PaginationLink,
+     PaginationNext,
+     PaginationPrevious,
+     PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 export default function LogsPage() {
      const api = useApi();
@@ -34,7 +43,7 @@ export default function LogsPage() {
      useEffect(() => {
           const handler = setTimeout(() => {
                setDebouncedSearch(search);
-               setPage(1); 
+               setPage(1);
           }, 500);
           return () => clearTimeout(handler);
      }, [search]);
@@ -57,6 +66,8 @@ export default function LogsPage() {
      });
 
      const logs = data?.data || [];
+     const pagination = data?.pagination || { page: 1, limit: 20, total: 0 };
+     const totalPages = Math.ceil(pagination.total / limit);
 
      const translateAction = (action: string) => {
           const map: Record<string, string> = {
@@ -192,26 +203,62 @@ export default function LogsPage() {
                </div>
 
                {/* Pagination */}
-               <div className="flex items-center justify-end space-x-2 py-4">
-                    <Button
-                         variant="outline"
-                         size="sm"
-                         onClick={() => setPage((p) => Math.max(1, p - 1))}
-                         disabled={page === 1 || isLoading}
-                    >
-                         <ChevronLeft className="h-4 w-4" />
-                         Sebelumnya
-                    </Button>
-                    <div className="text-sm font-medium">Halaman {page}</div>
-                    <Button
-                         variant="outline"
-                         size="sm"
-                         onClick={() => setPage((p) => p + 1)}
-                         disabled={logs.length < limit || isLoading}
-                    >
-                         Selanjutnya
-                         <ChevronRight className="h-4 w-4" />
-                    </Button>
+               <div className="py-4">
+                    <Pagination>
+                         <PaginationContent>
+                              <PaginationItem>
+                                   <PaginationPrevious
+                                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                        className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                   />
+                              </PaginationItem>
+
+                              {/* Simple Logic: Show current page and neighbors if needed, or just simple prev/next for now to avoid complex logic issues. 
+                                  But let's try to show some page numbers. */}
+
+                              {[...Array(totalPages)].map((_, i) => {
+                                   const p = i + 1;
+                                   // Show first, last, current, and neighbors
+                                   if (
+                                        p === 1 ||
+                                        p === totalPages ||
+                                        (p >= page - 1 && p <= page + 1)
+                                   ) {
+                                        return (
+                                             <PaginationItem key={p}>
+                                                  <PaginationLink
+                                                       isActive={page === p}
+                                                       onClick={() => setPage(p)}
+                                                  >
+                                                       {p}
+                                                  </PaginationLink>
+                                             </PaginationItem>
+                                        );
+                                   }
+
+                                   // Show ellipsis
+                                   if (
+                                        (p === page - 2 && p > 1) ||
+                                        (p === page + 2 && p < totalPages)
+                                   ) {
+                                        return (
+                                             <PaginationItem key={p}>
+                                                  <PaginationEllipsis />
+                                             </PaginationItem>
+                                        );
+                                   }
+
+                                   return null;
+                              })}
+
+                              <PaginationItem>
+                                   <PaginationNext
+                                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                        className={page >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                   />
+                              </PaginationItem>
+                         </PaginationContent>
+                    </Pagination>
                </div>
           </div>
      );
