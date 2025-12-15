@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 import { LayoutDashboard, Users, UserCheck, Vote, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import Image from "next/image";
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 export const sidebarLinks = [
      { label: "Beranda", href: "/", icon: LayoutDashboard, roles: ["super_admin", "panitia", "viewer"] },
@@ -104,6 +105,9 @@ export function MobileSidebar() {
                     </Button>
                </SheetTrigger>
                <SheetContent side="left" className="p-0 w-64">
+                    <VisuallyHidden>
+                         <SheetTitle>Menu Navigasi</SheetTitle>
+                    </VisuallyHidden>
                     <div className="flex h-full w-full flex-col bg-background">
                          <div className="flex h-15 items-center px-6 border-b border-border/50">
                               <Vote className="h-6 w-6 text-primary mr-3" />

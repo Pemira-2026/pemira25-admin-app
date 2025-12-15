@@ -254,10 +254,10 @@ export default function StudentsPage() {
                               {isLoading ? (
                                    Array.from({ length: 10 }).map((_, i) => (
                                         <TableRow key={i}>
-                                             <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                                             <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
-                                             <TableCell><Skeleton className="h-4 w-[250px]" /></TableCell>
-                                             <TableCell><Skeleton className="h-6 w-[120px] rounded-full" /></TableCell>
+                                             <TableCell><Skeleton className="h-4 w-25" /></TableCell>
+                                             <TableCell><Skeleton className="h-4 w-50" /></TableCell>
+                                             <TableCell><Skeleton className="h-4 w-62.5" /></TableCell>
+                                             <TableCell><Skeleton className="h-6 w-30 rounded-full" /></TableCell>
                                              <TableCell className="text-right">
                                                   <div className="flex justify-end gap-1">
                                                        <Skeleton className="h-8 w-8 rounded-md" />

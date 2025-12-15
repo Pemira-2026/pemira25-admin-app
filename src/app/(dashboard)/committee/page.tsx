@@ -2,12 +2,11 @@
 "use client";
 
 import { useApi } from "@/lib/api";
-import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Shield, Plus, MoreHorizontal, Edit, Trash2, UserPlus, Undo2, XCircle } from "lucide-react";
+import { Shield, MoreHorizontal, Edit, Trash2, UserPlus, Undo2, XCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -23,11 +22,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default function CommitteePage() {
      const api = useApi();
-     const { user: currentUser } = useAuth();
      const [isAddOpen, setIsAddOpen] = useState(false);
      const [searchQuery, setSearchQuery] = useState("");
      const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -37,13 +34,6 @@ export default function CommitteePage() {
      const [isPasswordOpen, setIsPasswordOpen] = useState(false);
      const [selectedUser, setSelectedUser] = useState<any>(null);
      const [password, setPassword] = useState("");
-
-     // Action Dialog State (Delete, Permanent, Restore, Demote)
-     const [actionDialog, setActionDialog] = useState<{ isOpen: boolean; type: 'delete' | 'permanent' | 'restore' | 'demote'; data: any }>({
-          isOpen: false,
-          type: 'delete',
-          data: null
-     });
 
      const { data: users, isLoading, refetch } = useQuery({
           queryKey: ['committee-users'],
@@ -201,9 +191,9 @@ export default function CommitteePage() {
                               {isLoading ? (
                                    Array.from({ length: 5 }).map((_, i) => (
                                         <TableRow key={i}>
-                                             <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
-                                             <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
-                                             <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                                             <TableCell><Skeleton className="h-4 w-37.5" /></TableCell>
+                                             <TableCell><Skeleton className="h-4 w-50" /></TableCell>
+                                             <TableCell><Skeleton className="h-4 w-25" /></TableCell>
                                              <TableCell className="text-right"><Skeleton className="h-8 w-8 rounded-md ml-auto" /></TableCell>
                                         </TableRow>
                                    ))

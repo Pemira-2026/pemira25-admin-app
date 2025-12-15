@@ -2,6 +2,8 @@ import RequireAuth from "@/components/auth/require-auth";
 import { Sidebar, MobileSidebar } from "@/components/layout/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
 
+import { Clock } from "@/components/layout/clock";
+
 export default function DashboardLayout({
      children,
 }: {
@@ -14,7 +16,10 @@ export default function DashboardLayout({
                     <div className="flex flex-col flex-1 h-screen overflow-hidden">
                          <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-15 lg:px-6 justify-between md:justify-end">
                               <MobileSidebar />
-                              <ModeToggle />
+                              <div className="flex items-center gap-2">
+                                   <Clock />
+                                   <ModeToggle />
+                              </div>
                          </header>
                          <main className="flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 overflow-auto py-8">
                               <div className="flex flex-col gap-6 p-4 md:p-8 pt-6">
