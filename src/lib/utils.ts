@@ -15,11 +15,6 @@ export function fixUtcToWib(dateString: string | Date): Date {
      if (dateString instanceof Date) return dateString;
      if (!dateString) return new Date();
 
-     // Remove 'Z' if present, to force Local Time parsing
-     let cleanString = dateString;
-     if (cleanString.endsWith('Z')) {
-          cleanString = cleanString.slice(0, -1);
-     }
-
-     return new Date(cleanString);
+     // Now that backend sends proper ISO string with timezone, we just parse it.
+     return new Date(dateString);
 }
