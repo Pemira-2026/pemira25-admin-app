@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { api } from "./api";
 
@@ -34,15 +33,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
      const router = useRouter();
      const pathname = usePathname();
 
-     useEffect(() => {
-          checkAuth();
-     }, []);
-
-     const checkAuth = async () => {
+     const checkAuth = useCallback(async () => {
           try {
                const res = await api.get('/auth/me');
                setUser(res.data);
-          } catch (error: any) {
+          } catch {
                setUser(null);
                if (pathname !== '/login') {
                     router.push('/login');
@@ -50,7 +45,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } finally {
                setLoading(false);
           }
-     };
+     }, [pathname, router]);
+
+     useEffect(() => {
+          checkAuth();
+     }, [checkAuth]);
 
      const login = (token: string, userData: User) => {
           localStorage.setItem('admin_token', token);
