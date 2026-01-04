@@ -21,6 +21,7 @@ export function CandidateDialog({ children, candidate, onSuccess }: { children: 
      const [orderNumber, setOrderNumber] = useState("");
      const [vision, setVision] = useState("");
      const [mission, setMission] = useState("");
+     const [programs, setPrograms] = useState("");
      const [photoUrl, setPhotoUrl] = useState("");
 
      // Populate form on edit
@@ -32,6 +33,7 @@ export function CandidateDialog({ children, candidate, onSuccess }: { children: 
                setOrderNumber(String(candidate.orderNumber));
                setVision(candidate.vision || "");
                setMission(candidate.mission || "");
+               setPrograms(candidate.programs || "");
                setPhotoUrl(candidate.photoUrl || "");
           } else {
                // Reset
@@ -40,6 +42,7 @@ export function CandidateDialog({ children, candidate, onSuccess }: { children: 
                setOrderNumber("");
                setVision("");
                setMission("");
+               setPrograms("");
                setPhotoUrl("");
           }
      }, [candidate, open]);
@@ -55,6 +58,7 @@ export function CandidateDialog({ children, candidate, onSuccess }: { children: 
                orderNumber: Number(orderNumber),
                vision,
                mission,
+               programs,
                photoUrl
           };
 
@@ -110,6 +114,10 @@ export function CandidateDialog({ children, candidate, onSuccess }: { children: 
                          <div className="grid gap-2">
                               <Label htmlFor="vision">Visi</Label>
                               <Textarea id="vision" value={vision} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setVision(e.target.value)} placeholder="Visi kandidat..." />
+                         </div>
+                         <div className="grid gap-2">
+                              <Label htmlFor="programs">Program Unggulan (Pisahkan dengan baris baru)</Label>
+                              <Textarea id="programs" value={programs} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setPrograms(e.target.value)} rows={5} placeholder="1. Program pertama&#10;2. Program kedua&#10;..." />
                          </div>
                          <div className="grid gap-2">
                               <Label htmlFor="mission">Misi (Pisahkan dengan baris baru untuk poin-poin)</Label>
