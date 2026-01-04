@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { api } from '@/lib/api';
+import { Socket } from 'socket.io-client';
+import { api, initSocket } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { MessageCircle, Search, User, Clock, Send, Archive, MoreVertical, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -34,8 +34,6 @@ interface Message {
      createdAt: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
-
 export default function ChatDashboard() {
      const [sessions, setSessions] = useState<ChatSession[]>([]);
      const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -66,10 +64,7 @@ export default function ChatDashboard() {
           const token = localStorage.getItem('admin_token');
           if (!token) return;
 
-          const newSocket = io(API_URL, {
-               auth: { token },
-               withCredentials: true
-          });
+          const newSocket = initSocket(token);
 
           newSocket.on('connect', () => {
                console.log("Admin Socket Connected");
