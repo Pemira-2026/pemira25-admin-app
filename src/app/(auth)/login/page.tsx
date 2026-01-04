@@ -55,10 +55,10 @@ export default function LoginPage() {
                     <div className="flex flex-col items-center space-y-4 text-center">
                          <div className="relative h-24 w-24 overflow-hidden drop-shadow-lg transition-transform hover:scale-105 duration-300">
                               <Image
-                                   src="/pemira-logo.png"
+                                   src="/pemira-logov2.png"
                                    alt="PEMIRA Logo"
                                    fill
-                                   className="object-contain"
+                                   className="object-contain rounded-full"
                                    priority
                               />
                          </div>
