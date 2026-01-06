@@ -25,6 +25,7 @@ interface PreviewData {
      nim: string;
      name: string;
      email: string;
+     batch: string;
      isValid: boolean;
      original: Record<string, unknown>;
 }
@@ -33,6 +34,7 @@ interface ColumnMapping {
      nim: string;
      name: string;
      email: string;
+     batch: string;
 }
 
 export function ImportModal({ open, onOpenChange }: ImportModalProps) {
@@ -46,7 +48,7 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
 
      // Column Mapping
      const [headers, setHeaders] = useState<string[]>([]);
-     const [mapping, setMapping] = useState<ColumnMapping>({ nim: "", name: "", email: "" });
+     const [mapping, setMapping] = useState<ColumnMapping>({ nim: "", name: "", email: "", batch: "" });
 
      // Data Preview
      const [rawJson, setRawJson] = useState<Record<string, unknown>[]>([]);
@@ -67,7 +69,7 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
           setSheets([]);
           setSelectedSheet("");
           setHeaders([]);
-          setMapping({ nim: "", name: "", email: "" });
+          setMapping({ nim: "", name: "", email: "", batch: "" });
           setRawJson([]);
           setPreviewData([]);
           setSelectedRows(new Set());
@@ -153,12 +155,13 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
           setHeaders(extractedHeaders);
 
           // Auto-detect Mapping
-          const newMapping = { nim: "", name: "", email: "" };
+          const newMapping = { nim: "", name: "", email: "", batch: "" };
           extractedHeaders.forEach(h => {
                const lower = h.toLowerCase();
                if (lower.includes("nim") || lower.includes("nomor") || lower.includes("induk")) newMapping.nim = h;
                else if (lower.includes("nama") || lower.includes("name")) newMapping.name = h;
                else if (lower.includes("email") || lower.includes("surel")) newMapping.email = h;
+               else if (lower.includes("angkatan") || lower.includes("batch") || lower.includes("tahun")) newMapping.batch = h;
           });
           setMapping(newMapping);
 
@@ -175,13 +178,15 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
                const nim = String(row[mapping.nim] || "").trim();
                const name = String(row[mapping.name] || "").trim();
                const email = mapping.email ? String(row[mapping.email] || "").trim() : "";
+               const batch = mapping.batch ? String(row[mapping.batch] || "").trim() : "";
                const isValid = nim.length > 0 && name.length > 0;
 
                // Construct a clean object for backend using standard keys
                const cleanOriginal = {
                     NIM: nim,
                     Name: name,
-                    Email: email
+                    Email: email,
+                    Batch: batch
                };
 
                return {
@@ -189,6 +194,7 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
                     nim,
                     name,
                     email,
+                    batch,
                     isValid,
                     original: cleanOriginal
                };
@@ -393,6 +399,20 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
                                              </Select>
                                              <p className="text-[10px] text-muted-foreground">Email aktif untuk verifikasi</p>
                                         </div>
+
+                                        <div className="space-y-2">
+                                             <Label>Kolom Angkatan <span className="text-muted-foreground text-[10px] font-normal">(Opsional)</span></Label>
+                                             <Select value={mapping.batch || "ignore"} onValueChange={(val) => setMapping(prev => ({ ...prev, batch: val === "ignore" ? "" : val }))}>
+                                                  <SelectTrigger>
+                                                       <SelectValue placeholder="Pilih kolom Angkatan" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                       <SelectItem value="ignore">- Tidak Ada -</SelectItem>
+                                                       {headers.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                                                  </SelectContent>
+                                             </Select>
+                                             <p className="text-[10px] text-muted-foreground">Tahun Angkatan</p>
+                                        </div>
                                    </div>
                               </div>
                          )}
@@ -440,6 +460,7 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
                                                             </TableHead>
                                                             <TableHead>NIM</TableHead>
                                                             <TableHead>Nama</TableHead>
+                                                            <TableHead>Angkatan</TableHead>
                                                             <TableHead>Email</TableHead>
                                                             <TableHead className="text-right">Status</TableHead>
                                                        </TableRow>
@@ -463,6 +484,7 @@ export function ImportModal({ open, onOpenChange }: ImportModalProps) {
                                                                       </TableCell>
                                                                       <TableCell className="font-medium">{row.nim || <span className="text-white text-xs italic">(Kosong)</span>}</TableCell>
                                                                       <TableCell>{row.name || <span className="text-white text-xs italic">(Kosong)</span>}</TableCell>
+                                                                      <TableCell>{row.batch || "-"}</TableCell>
                                                                       <TableCell>{row.email || "-"}</TableCell>
                                                                       <TableCell className="text-right">
                                                                            {row.isValid ? (

@@ -7,7 +7,7 @@ import { useApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FileUp, Search, RefreshCw, Mail, CheckCircle2, Trash2, Undo2, XCircle, Plus } from "lucide-react";
+import { FileUp, Search, RefreshCw, Mail, CheckCircle2, Trash2, Undo2, XCircle, Plus, Pencil } from "lucide-react";
 import { ImportModal } from "./import-modal";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
@@ -49,7 +49,11 @@ export default function StudentsPage() {
      });
 
      // Add Student State
-     const [newStudent, setNewStudent] = useState({ nim: "", name: "", email: "" });
+     const [newStudent, setNewStudent] = useState({ nim: "", name: "", email: "", batch: "" });
+
+     // Edit Student State
+     const [isEditOpen, setIsEditOpen] = useState(false);
+     const [editStudent, setEditStudent] = useState<{ id: string; nim: string; name: string; email: string; batch: string } | null>(null);
 
      // Tick for cooldown timer
      useEffect(() => {
@@ -115,7 +119,7 @@ export default function StudentsPage() {
                async () => {
                     await api.post('/students', newStudent);
                     setIsAddOpen(false);
-                    setNewStudent({ nim: "", name: "", email: "" });
+                    setNewStudent({ nim: "", name: "", email: "", batch: "" });
                     refetch();
                },
                {
@@ -124,6 +128,44 @@ export default function StudentsPage() {
                     error: (err) => `Gagal: ${err.response?.data?.message || "Error"}`
                }
           );
+     };
+
+     // Edit Student
+     const handleEditStudent = async () => {
+          if (!editStudent || !editStudent.nim || !editStudent.name) {
+               toast.error("NIM dan Nama wajib diisi");
+               return;
+          }
+
+          toast.promise(
+               async () => {
+                    await api.put(`/students/${editStudent.id}`, {
+                         nim: editStudent.nim,
+                         name: editStudent.name,
+                         email: editStudent.email,
+                         batch: editStudent.batch
+                    });
+                    setIsEditOpen(false);
+                    setEditStudent(null);
+                    refetch();
+               },
+               {
+                    loading: 'Menyimpan perubahan...',
+                    success: 'Data mahasiswa berhasil diperbarui',
+                    error: (err) => `Gagal: ${err.response?.data?.message || "Error"}`
+               }
+          );
+     };
+
+     const openEditDialog = (student: any) => {
+          setEditStudent({
+               id: student.id,
+               nim: student.nim || "",
+               name: student.name || "",
+               email: student.email || "",
+               batch: student.batch || ""
+          });
+          setIsEditOpen(true);
      };
 
      // Action Handlers
@@ -245,6 +287,7 @@ export default function StudentsPage() {
                               <TableRow>
                                    <TableHead>NIM</TableHead>
                                    <TableHead>Nama</TableHead>
+                                   <TableHead>Angkatan</TableHead>
                                    <TableHead>Email</TableHead>
                                    <TableHead>Status Voters</TableHead>
                                    <TableHead className="text-right">Aksi</TableHead>
@@ -256,6 +299,7 @@ export default function StudentsPage() {
                                         <TableRow key={i}>
                                              <TableCell><Skeleton className="h-4 w-25" /></TableCell>
                                              <TableCell><Skeleton className="h-4 w-50" /></TableCell>
+                                             <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                                              <TableCell><Skeleton className="h-4 w-62.5" /></TableCell>
                                              <TableCell><Skeleton className="h-6 w-30 rounded-full" /></TableCell>
                                              <TableCell className="text-right">
@@ -279,6 +323,7 @@ export default function StudentsPage() {
                                                        {isDeleted && <span className="ml-2 text-[10px] text-destructive border border-destructive px-1 rounded">DELETED</span>}
                                                   </TableCell>
                                                   <TableCell>{student.name}</TableCell>
+                                                  <TableCell>{student.batch || "-"}</TableCell>
                                                   <TableCell>{student.email}</TableCell>
                                                   <TableCell>
                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${student.hasVoted
@@ -315,6 +360,17 @@ export default function StudentsPage() {
                                                                       title="Tandai Hadir (Offline)"
                                                                  >
                                                                       <CheckCircle2 className="h-4 w-4" />
+                                                                 </Button>
+                                                            )}
+                                                            {!isDeleted && (
+                                                                 <Button
+                                                                      size="sm"
+                                                                      variant="ghost"
+                                                                      className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                                      onClick={() => openEditDialog(student)}
+                                                                      title="Edit Data"
+                                                                 >
+                                                                      <Pencil className="h-4 w-4" />
                                                                  </Button>
                                                             )}
                                                             {isSuperAdmin && !isDeleted && (
@@ -448,6 +504,15 @@ export default function StudentsPage() {
                                    />
                               </div>
                               <div className="space-y-2">
+                                   <Label htmlFor="batch">Angkatan (Opsional)</Label>
+                                   <Input
+                                        id="batch"
+                                        placeholder="Contoh: 2023"
+                                        value={newStudent.batch}
+                                        onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                                   />
+                              </div>
+                              <div className="space-y-2">
                                    <Label htmlFor="email">Email (Opsional)</Label>
                                    <Input
                                         id="email"
@@ -463,6 +528,60 @@ export default function StudentsPage() {
                          </div>
                     </DialogContent>
                </Dialog>
+
+               {/* Edit Student Dialog */}
+               <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                    <DialogContent>
+                         <DialogHeader>
+                              <DialogTitle>Edit Data Mahasiswa</DialogTitle>
+                         </DialogHeader>
+                         {editStudent && (
+                              <div className="space-y-4 py-2">
+                                   <div className="space-y-2">
+                                        <Label htmlFor="edit-nim">NIM <span className="text-red-500">*</span></Label>
+                                        <Input
+                                             id="edit-nim"
+                                             placeholder="Contoh: 0110221001"
+                                             value={editStudent.nim}
+                                             onChange={(e) => setEditStudent({ ...editStudent, nim: e.target.value })}
+                                        />
+                                   </div>
+                                   <div className="space-y-2">
+                                        <Label htmlFor="edit-name">Nama Lengkap <span className="text-red-500">*</span></Label>
+                                        <Input
+                                             id="edit-name"
+                                             placeholder="Nama mahasiswa..."
+                                             value={editStudent.name}
+                                             onChange={(e) => setEditStudent({ ...editStudent, name: e.target.value })}
+                                        />
+                                   </div>
+                                   <div className="space-y-2">
+                                        <Label htmlFor="edit-batch">Angkatan (Opsional)</Label>
+                                        <Input
+                                             id="edit-batch"
+                                             placeholder="Contoh: 2023"
+                                             value={editStudent.batch}
+                                             onChange={(e) => setEditStudent({ ...editStudent, batch: e.target.value })}
+                                        />
+                                   </div>
+                                   <div className="space-y-2">
+                                        <Label htmlFor="edit-email">Email (Opsional)</Label>
+                                        <Input
+                                             id="edit-email"
+                                             placeholder="Email..."
+                                             value={editStudent.email}
+                                             onChange={(e) => setEditStudent({ ...editStudent, email: e.target.value })}
+                                        />
+                                   </div>
+                                   <div className="flex justify-end gap-2 pt-4">
+                                        <Button variant="outline" onClick={() => setIsEditOpen(false)}>Batal</Button>
+                                        <Button onClick={handleEditStudent}>Simpan Perubahan</Button>
+                                   </div>
+                              </div>
+                         )}
+                    </DialogContent>
+               </Dialog>
           </div>
      );
 }
+
